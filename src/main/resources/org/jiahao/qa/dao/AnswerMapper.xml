@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jiahao.qa.dao.AnswerMapper" >
+  <resultMap id="BaseResultMap" type="org.jiahao.qa.pojo.Answer" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="userid" property="userid" jdbcType="VARCHAR" />
+    <result column="questionid" property="questionid" jdbcType="VARCHAR" />
+    <result column="parentid" property="parentid" jdbcType="VARCHAR"/>
+    <result column="date" property="date" jdbcType="TIMESTAMP" />
+    <result column="idpath" property="idpath" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR"/>
+    <result column="title" property="title" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, content, userid, questionid, date, idpath, parentid
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select a.*, u.username, q.title
+    from answer a, user u, question q
+    where a.id = #{id,jdbcType=VARCHAR} and a.userid = u.id and q.id=a.questionid
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from answer
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="org.jiahao.qa.pojo.Answer" >
+    insert into answer (id, content, userid, 
+      questionid, date, idpath, parentid
+      )
+    values (#{id,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR},
+      #{questionid,jdbcType=VARCHAR}, #{date,jdbcType=TIMESTAMP}, #{idpath,jdbcType=VARCHAR}, #{parentid,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="org.jiahao.qa.pojo.Answer" >
+    insert into answer
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="userid != null" >
+        userid,
+      </if>
+      <if test="questionid != null" >
+        questionid,
+      </if>
+      <if test="date != null" >
+        date,
+      </if>
+      <if test="idpath != null" >
+        idpath,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="questionid != null" >
+        #{questionid,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null" >
+        #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="idpath != null" >
+        #{idpath,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jiahao.qa.pojo.Answer" >
+    update answer
+    <set >
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null" >
+        userid = #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="questionid != null" >
+        questionid = #{questionid,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null" >
+        date = #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="idpath != null" >
+        idpath = #{idpath,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.jiahao.qa.pojo.Answer" >
+    update answer
+    set content = #{content,jdbcType=VARCHAR},
+      userid = #{userid,jdbcType=VARCHAR},
+      questionid = #{questionid,jdbcType=VARCHAR},
+      date = #{date,jdbcType=TIMESTAMP},
+      idpath = #{idpath,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByQuestionId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select a.*, u.username, q.title
+    from answer a, user u, question q
+    where a.userid=u.id and a.questionid=#{id, jdbcType=VARCHAR} and a.questionid=q.id order by date
+  </select>
+  <select id="selectTop5Answers" resultMap="BaseResultMap">
+    select a.*, u.username, q.title
+    from answer a, user u, question q
+    where a.userid=u.id and a.questionid=q.id order by a.date desc limit 0, 5
+  </select>
+  <select id="selectByUserId" resultMap="BaseResultMap">
+    select a.*, q.title
+    from answer a, question q
+    where a.userid=#{userId,jdbcType=VARCHAR} and a.questionid=q.id
+    <if test="q != null">
+      and a.content like concat('%', #{q}, '%')
+    </if>
+    order by a.date desc
+    <if test="startPos != null and pageSize != null">
+      limit #{startPos}, #{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByUserId" resultType="int">
+    select count(1)
+    from answer a, question q
+    where a.userid=#{userId,jdbcType=VARCHAR} and a.questionid=q.id
+    <if test="q != null">
+      and a.content like concat('%', #{q}, '%')
+    </if>
+  </select>
+  <select id="selectAnswerCntByQid" parameterType="java.lang.String" resultType="int">
+    select count(1) from answer a where a.questionid=#{id, jdbcType=VARCHAR}
+  </select>
+  <select id="selectUnLookAnswers" parameterType="java.lang.String" resultMap="BaseResultMap">
+
+    SELECT
+	a.*, u.username
+    FROM
+        answer a,
+        user u
+    WHERE
+        a.userid = u.id
+    AND a.islook = 0
+    AND (
+        (
+            a.parentid is not null and
+            a.userid in (
+                SELECT
+                    a1.userid
+                FROM
+                    answer a1
+                WHERE
+                    a1.parentid is not null and a1.parentid IN (
+                        SELECT
+                            a2.id
+                        FROM
+                            answer a2
+                        WHERE
+                            a2.userid = #{id}
+                    ) and a1.userid != #{id}
+            )
+        )
+        OR (
+            a.parentid IS NULL
+            AND a.questionid IN (
+                SELECT
+                    q.id
+                FROM
+                    question q
+                WHERE
+                    q.userid = #{id}
+            )
+            AND a.userid != #{id}
+        )
+    )
+    ORDER BY
+	a.date DESC
+  </select>
+  <update id="updateAnswerLook" parameterType="java.lang.String">
+    update answer set islook = 1 where id=#{id, jdbcType=VARCHAR}
+  </update>
+  <select id="selectAnswerList" resultMap="BaseResultMap">
+    select a.*, u.username, q.title
+    from answer a, user u, question q
+    where a.userid=u.id and a.questionid=q.id
+    <if test="q != null">
+      and u.username like concat('%', #{q}, '%')
+    </if>
+    order by a.date desc limit #{startPos}, #{pageSize}
+  </select>
+  <select id="selectCount" resultType="int">
+    select count(1) from answer a, user u
+    where a.userid=u.id
+    <if test="q != null">
+      and u.username like concat('%', #{q}, '%')
+    </if>
+  </select>
+</mapper>

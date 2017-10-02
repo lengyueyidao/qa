@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jiahao.qa.dao.TagMapper" >
+  <resultMap id="BaseResultMap" type="org.jiahao.qa.pojo.Tag" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="questionCount" property="questionCount" javaType="INTEGER"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tag
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tag
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="org.jiahao.qa.pojo.Tag" >
+    insert into tag (id, name)
+    values (#{id, jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="org.jiahao.qa.pojo.Tag" >
+    insert into tag
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jiahao.qa.pojo.Tag" >
+    update tag
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.jiahao.qa.pojo.Tag" >
+    update tag
+    set name = #{name,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <insert id="insertOne" parameterType="java.lang.String">
+    insert into tag(name) values(#{tag})
+  </insert>
+  <insert id="insertList" parameterType="java.util.List">
+    insert into tag(name) values
+    <foreach collection="list" item="tag" index="index" separator=",">
+      (#{tag})
+    </foreach>
+  </insert>
+  <select id="selectTagList" resultMap="BaseResultMap">
+    SELECT
+    t.*,
+    IF (b.cnt IS NULL, 0, b.cnt) AS questionCount
+    FROM
+    tag t
+    LEFT JOIN (
+    SELECT
+    qt.tagid,
+    count(1) AS cnt
+    FROM
+    questiontag qt
+    GROUP BY
+    qt.tagid
+    ) b ON t.id = b.tagid
+    <if test="q != null and q != ''">
+    WHERE
+    t. NAME LIKE concat('%', #{q}, '%')
+    </if>
+    ORDER BY
+    b.cnt DESC
+    <if test="startPage != null and pageSize != null">
+      limit #{startPage}, #{pageSize}
+    </if>
+
+  </select>
+  <select id="selectTagsByQuestionId" resultMap="BaseResultMap">
+    select t.* from tag t, questiontag qt where qt.questionid=#{questionid, jdbcType=VARCHAR} and qt.tagid=t.id
+  </select>
+  <select id="selectByName" resultMap="BaseResultMap">
+    select t.*
+    from tag t
+    where t.name = #{name, jdbcType=VARCHAR}
+  </select>
+  <select id="selectTagCount" resultType="int">
+    SELECT
+    count(1)
+    FROM
+    tag t
+    LEFT JOIN (
+    SELECT
+    qt.tagid,
+    count(1) AS cnt
+    FROM
+    questiontag qt
+    GROUP BY
+    qt.tagid
+    ) b ON t.id = b.tagid
+    <if test="q != null and q != ''">
+      WHERE
+      t. NAME LIKE concat('%', #{q}, '%')
+    </if>
+  </select>
+  <select id="selectTagByName" resultMap="BaseResultMap">
+    select * from tag where name = #{name}
+  </select>
+</mapper>

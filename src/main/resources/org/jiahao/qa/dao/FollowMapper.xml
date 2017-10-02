@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jiahao.qa.dao.FollowMapper" >
+  <resultMap id="BaseResultMap" type="org.jiahao.qa.pojo.Follow" >
+    <id column="userid" property="userid" jdbcType="VARCHAR" />
+    <id column="followuserid" property="followuserid" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR"/>
+    <result column="followusername" property="followusername" jdbcType="VARCHAR"/>
+    <result column="description" property="description" jdbcType="VARCHAR"/>
+    <result column="followdescription" property="followdescription" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <insert id="insertFollow" >
+    insert into follow(userid, followuserid) values(#{userid}, #{followuserid})
+  </insert>
+  <delete id="deleteFollow" >
+    delete from follow where userid=#{userid} and followuserid=#{followuserid}
+  </delete>
+  <select id="selectFollowing" resultMap="BaseResultMap">
+    select f.*, u.username as username, fu.username as followusername
+    from follow f, user u, user fu
+    where f.userid = u.id and f.followuserid = fu.id and f.userid=#{userid}
+  </select>
+  <select id="selectFollowed" resultMap="BaseResultMap">
+    select f.*, u.username as username, fu.username as followusername, u.description as description, fu.description as followdescription
+    from follow f, user u, user fu
+    where f.userid = u.id and f.followuserid = fu.id and f.followuserid=#{followuserid}
+  </select>
+  <select id="selectFollowingCount" resultType="int">
+    select count(1) from follow where userid = #{userid}
+  </select>
+  <select id="selectFollowedCount" resultType="int">
+    select count(1) from follow where followuserid = #{followuserid}
+  </select>
+  <select id="selectIsFollowed" resultMap="BaseResultMap">
+    select * from follow where userid=#{userid} and followuserid=#{followuserid}
+  </select>
+  <select id="selectFollowList" resultMap="BaseResultMap">
+    SELECT
+	f.userid,
+	u1.username,
+	f.followuserid,
+	u2.username AS followusername
+    FROM
+        follow f,
+        user u1,
+        user u2
+    WHERE
+        f.userid = u1.id
+    AND f.followuserid = u2.id
+    <if test="q != null">
+      AND (
+          u1.username LIKE concat('%', #{q}, '%')
+          OR u2.username LIKE concat('%', #{q}, '%')
+      )
+    </if>
+    LIMIT #{startPos}, #{pageSize}
+  </select>
+  <select id="selectCount" resultType="int">
+    SELECT
+    COUNT(1)
+    FROM
+    follow f,
+    user u1,
+    user u2
+    WHERE
+    f.userid = u1.id
+    AND f.followuserid = u2.id
+    <if test="q != null">
+      AND (
+      u1.username LIKE concat('%', #{q}, '%')
+      OR u2.username LIKE concat('%', #{q}, '%')
+      )
+    </if>
+  </select>
+</mapper>

@@ -1,0 +1,23 @@
+.more {
+    background: #428bca;
+    padding: 10px 18px;
+    border-radius: 4px;
+    line-height: 1;
+    font-size: 13px;
+    display: inline-block;
+    text-transform: uppercase;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    color: #fff;
+    font-weight: bold;
+}
+
+a.more:link {
+	background: #428bca;
+	color: #fff;
+}
+
+a.more:hover {
+	background: #F5F5D5;
+	color: brown;
+}

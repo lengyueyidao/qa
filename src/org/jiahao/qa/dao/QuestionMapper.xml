@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jiahao.qa.dao.QuestionMapper">
+  <resultMap id="BaseResultMap" type="org.jiahao.qa.pojo.Question">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="userid" jdbcType="INTEGER" property="userid" />
+    <result column="views" jdbcType="INTEGER" property="views" />
+    <result column="answers" jdbcType="INTEGER" property="answers" />
+    <result column="date" jdbcType="TIMESTAMP" property="date" />
+    <result column="isover" jdbcType="INTEGER" property="isover" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, title, content, userid, views, answers, date, isover
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from question
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from question
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="org.jiahao.qa.pojo.Question">
+    insert into question (id, title, content, 
+      userid, views, answers, 
+      date, isover)
+    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+      #{userid,jdbcType=INTEGER}, #{views,jdbcType=INTEGER}, #{answers,jdbcType=INTEGER}, 
+      #{date,jdbcType=TIMESTAMP}, #{isover,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="org.jiahao.qa.pojo.Question">
+    insert into question
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="userid != null">
+        userid,
+      </if>
+      <if test="views != null">
+        views,
+      </if>
+      <if test="answers != null">
+        answers,
+      </if>
+      <if test="date != null">
+        date,
+      </if>
+      <if test="isover != null">
+        isover,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null">
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="views != null">
+        #{views,jdbcType=INTEGER},
+      </if>
+      <if test="answers != null">
+        #{answers,jdbcType=INTEGER},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isover != null">
+        #{isover,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jiahao.qa.pojo.Question">
+    update question
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null">
+        userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="views != null">
+        views = #{views,jdbcType=INTEGER},
+      </if>
+      <if test="answers != null">
+        answers = #{answers,jdbcType=INTEGER},
+      </if>
+      <if test="date != null">
+        date = #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isover != null">
+        isover = #{isover,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.jiahao.qa.pojo.Question">
+    update question
+    set title = #{title,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      userid = #{userid,jdbcType=INTEGER},
+      views = #{views,jdbcType=INTEGER},
+      answers = #{answers,jdbcType=INTEGER},
+      date = #{date,jdbcType=TIMESTAMP},
+      isover = #{isover,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <resultMap id="BaseResultMap" type="org.jiahao.qa.pojo.Question">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="userid" jdbcType="INTEGER" property="userid" />
+    <result column="views" jdbcType="INTEGER" property="views" />
+    <result column="answers" jdbcType="INTEGER" property="answers" />
+    <result column="date" jdbcType="TIMESTAMP" property="date" />
+    <result column="isover" jdbcType="INTEGER" property="isover" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, title, content, userid, views, answers, date, isover
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from question
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from question
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="org.jiahao.qa.pojo.Question">
+    insert into question (id, title, content, 
+      userid, views, answers, 
+      date, isover)
+    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+      #{userid,jdbcType=INTEGER}, #{views,jdbcType=INTEGER}, #{answers,jdbcType=INTEGER}, 
+      #{date,jdbcType=TIMESTAMP}, #{isover,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="org.jiahao.qa.pojo.Question">
+    insert into question
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="userid != null">
+        userid,
+      </if>
+      <if test="views != null">
+        views,
+      </if>
+      <if test="answers != null">
+        answers,
+      </if>
+      <if test="date != null">
+        date,
+      </if>
+      <if test="isover != null">
+        isover,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null">
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="views != null">
+        #{views,jdbcType=INTEGER},
+      </if>
+      <if test="answers != null">
+        #{answers,jdbcType=INTEGER},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isover != null">
+        #{isover,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jiahao.qa.pojo.Question">
+    update question
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null">
+        userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="views != null">
+        views = #{views,jdbcType=INTEGER},
+      </if>
+      <if test="answers != null">
+        answers = #{answers,jdbcType=INTEGER},
+      </if>
+      <if test="date != null">
+        date = #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isover != null">
+        isover = #{isover,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.jiahao.qa.pojo.Question">
+    update question
+    set title = #{title,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      userid = #{userid,jdbcType=INTEGER},
+      views = #{views,jdbcType=INTEGER},
+      answers = #{answers,jdbcType=INTEGER},
+      date = #{date,jdbcType=TIMESTAMP},
+      isover = #{isover,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

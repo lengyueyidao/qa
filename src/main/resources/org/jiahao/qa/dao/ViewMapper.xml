@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jiahao.qa.dao.ViewMapper" >
+  <resultMap id="BaseResultMap" type="org.jiahao.qa.pojo.View" >
+    <id column="userid" property="userid" jdbcType="VARCHAR" />
+    <id column="questionid" property="questionid" jdbcType="VARCHAR" />
+    <result column="viewtime" property="viewtime" jdbcType="TIMESTAMP"/>
+  </resultMap>
+  <select id="selectTodayView" resultMap="BaseResultMap">
+    select * from view where userid=#{userid} and questionid=#{questionid} and date(viewtime) = CURDATE()
+  </select>
+  <insert id="insertView">
+    insert into view(userid, questionid, viewtime) values(#{userid}, #{questionid}, now())
+  </insert>
+</mapper>

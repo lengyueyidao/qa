@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jiahao.qa.dao.QuestiontagMapper" >
+  <resultMap id="BaseResultMap" type="org.jiahao.qa.pojo.QuestiontagKey" >
+    <id column="questionid" property="questionid" jdbcType="VARCHAR" />
+    <id column="tagid" property="tagid" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="org.jiahao.qa.pojo.QuestiontagKey" >
+    delete from questiontag
+    where questionid = #{questionid,jdbcType=VARCHAR}
+      and tagid = #{tagid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="org.jiahao.qa.pojo.QuestiontagKey" >
+    insert into questiontag (questionid, tagid)
+    values (#{questionid,jdbcType=VARCHAR}, #{tagid,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="org.jiahao.qa.pojo.QuestiontagKey" >
+    insert into questiontag
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="questionid != null" >
+        questionid,
+      </if>
+      <if test="tagid != null" >
+        tagid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="questionid != null" >
+        #{questionid,jdbcType=VARCHAR},
+      </if>
+      <if test="tagid != null" >
+        #{tagid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="selectTagCountForQuestion" parameterType="java.lang.String">
+    select count(1) from questiontag where questionid = #{id.jdbcType=VARCHAR}
+  </select>
+  <select id="selectQuestionTagByQT" resultMap="BaseResultMap">
+    select * from questiontag where questionid = #{qid} and tagid = #{tid}
+  </select>
+  <delete id="deleteTagsByQuestionId">
+    delete from questiontag where questionid=#{questionid}
+  </delete>
+  <delete id="deleteTagsByTagId">
+    delete from questiontag where tagid=#{tagid}
+  </delete>
+</mapper>

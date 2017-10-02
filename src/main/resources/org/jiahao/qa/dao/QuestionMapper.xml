@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.jiahao.qa.dao.QuestionMapper" >
+  <resultMap id="BaseResultMap" type="org.jiahao.qa.pojo.Question" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="userid" property="userid" jdbcType="VARCHAR" />
+    <result column="views" property="views" jdbcType="INTEGER" />
+    <result column="answers" property="answers" jdbcType="INTEGER" />
+    <result column="date" property="date" jdbcType="TIMESTAMP" />
+    <result column="isover" property="isover" jdbcType="INTEGER" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <collection property="tags" ofType="org.jiahao.qa.pojo.Tag">
+      <id column="tagid" property="id" jdbcType="VARCHAR"/>
+      <result column="tagname" property="name" jdbcType="VARCHAR"/>
+    </collection>
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, title, content, userid, views, answers, date, isover
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from question
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from question
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="org.jiahao.qa.pojo.Question" >
+    insert into question (id, title, content,
+      userid, views,
+      answers, date, isover
+      )
+    values (#{id, jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+      #{userid,jdbcType=VARCHAR},  #{views,jdbcType=INTEGER},
+      #{answers,jdbcType=INTEGER}, now(), #{isover,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="org.jiahao.qa.pojo.Question" >
+    insert into question
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="userid != null" >
+        userid,
+      </if>
+      <if test="views != null" >
+        views,
+      </if>
+      <if test="answers != null" >
+        answers,
+      </if>
+      <if test="date != null" >
+        date,
+      </if>
+      <if test="isover != null" >
+        isover,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="views != null" >
+        #{views,jdbcType=INTEGER},
+      </if>
+      <if test="answers != null" >
+        #{answers,jdbcType=INTEGER},
+      </if>
+      <if test="date != null" >
+        #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isover != null" >
+        #{isover,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.jiahao.qa.pojo.Question" >
+    update question
+    <set >
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null" >
+        userid = #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="views != null" >
+        views = #{views,jdbcType=INTEGER},
+      </if>
+      <if test="answers != null" >
+        answers = #{answers,jdbcType=INTEGER},
+      </if>
+      date = now(),
+      <if test="isover != null" >
+        isover = #{isover,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.jiahao.qa.pojo.Question" >
+    update question
+    set title = #{title,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      userid = #{userid,jdbcType=VARCHAR},
+      views = #{views,jdbcType=INTEGER},
+      answers = #{answers,jdbcType=INTEGER},
+      date = #{date,jdbcType=TIMESTAMP},
+      isover = #{isover,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectQuestionList" resultMap="BaseResultMap" >
+    <if test="qList == null">
+      select
+      q.*, u.username
+      from question q, user u
+      where q.userid = u.id
+      <if test="isover != null">
+        and q.isover = #{isover, jdbcType=INTEGER}
+      </if>
+      order by q.date desc limit #{startPos}, #{pageSize}
+    </if>
+    <if test="qList != null">
+      select *
+      from (select q.*,u.username, sum(0
+      <foreach collection="qList" item="q" index="index" >
+        +(case when instr(title,#{q})>0 then 1 else 0 end)
+        +(case when instr(content, #{q})>0 then 1 else 0 end)
+      </foreach>
+      )
+      as cnt from question q, user u where q.userid=u.id
+      <if test="isover != null">
+        and isover = #{isover}
+      </if>
+      group by id) as temp
+      where cnt>0
+      order by cnt desc,date desc
+      limit #{startPos}, #{pageSize}
+    </if>
+
+  </select>
+  <select id="selectQuestion" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT qu.*, tqt.tagid, tqt.tagname FROM
+    (
+    SELECT q.*, u.username FROM question q, user u
+    WHERE q.id = #{id}
+    AND q.userid = u.id
+    ) qu
+    INNER JOIN
+    (
+    SELECT t.id tagid, t. NAME tagname, qt.questionid FROM tag t, questiontag qt
+    WHERE t.id = qt.tagid
+    ) tqt ON qu.id = tqt.questionid
+  </select>
+  <select id="selectQuestionListByTag" resultMap="BaseResultMap">
+    <if test="qList == null">
+      select
+      q.*, u.username
+      from question q, user u
+      where q.userid = u.id
+      and q.id in (select questionid from questiontag qt where qt.tagid=#{tagid, jdbcType=VARCHAR} )
+      order by q.date desc limit #{startPos}, #{pageSize}
+    </if>
+    <if test="qList != null">
+      select *
+      from (select q.*,u.username, sum(0
+      <foreach collection="qList" item="q" index="index" >
+        +(case when instr(title,#{q})>0 then 1 else 0 end)
+        +(case when instr(content, #{q})>0 then 1 else 0 end)
+      </foreach>
+      )
+      as cnt from question q, user u, questiontag qt where q.userid=u.id
+      <if test="tagid != null">
+        and qt.tagid = #{qt.tagid}
+      </if>
+      group by id) as temp
+      where cnt>0
+      order by cnt desc,date desc
+      limit #{startPos}, #{pageSize}
+    </if>
+  </select>
+  <select id="selectQuestionListByUserId" resultMap="BaseResultMap">
+
+    SELECT qu.*, tqt.tagid, tqt.tagname FROM
+    (
+      SELECT q.*, u.username FROM question q, user u
+      WHERE q.userid = #{userid}
+      AND q.userid = u.id
+      <if test="isover != null">
+        AND q.isover = #{isover}
+      </if>
+      <if test="q != null">
+        AND q.title like concat('%', #{q}, '%')
+      </if>
+      ORDER BY q.date DESC
+      <if test="startPos != null and pageSize != null">
+        LIMIT #{startPos}, #{pageSize}
+      </if>
+    ) qu
+    INNER JOIN
+    (
+      SELECT t.id tagid, t. NAME tagname, qt.questionid FROM tag t, questiontag qt
+      WHERE t.id = qt.tagid
+    ) tqt ON qu.id = tqt.questionid
+  </select>
+  <select id="selectQuestionCountByUserId" resultType="int">
+    select count(1) from question where
+    <if test="isover != null">
+      isover=#{isover} and
+    </if>
+    <if test="q != null">
+      title like concat('%', #{q}, '%') and
+    </if>
+    userid=#{userid}
+  </select>
+  <select id="selectTop5Questions" resultMap="BaseResultMap">
+    select q.*, u.username
+    from user u, question q
+    where u.id = q.userid order by q.date desc limit 0, 5
+  </select>
+  <select id="selectQuestionCount" resultType="int" >
+    <if test="qList == null">
+      select
+      count(1)
+      from question q
+      <if test="isover != null">
+        where q.isover = #{isover, jdbcType=INTEGER}
+      </if>
+    </if>
+    <if test="qList != null">
+      select count(1)
+      from (select q.*,u.username, sum(0
+      <foreach collection="qList" item="q" index="index" >
+        +(case when instr(title,#{q})>0 then 1 else 0 end)
+        +(case when instr(content, #{q})>0 then 1 else 0 end)
+      </foreach>
+      )
+      as cnt from question q, user u where q.userid=u.id
+      <if test="isover != null">
+        and isover = #{isover}
+      </if>
+      group by id) as temp
+      where cnt>0
+    </if>
+  </select>
+  <select id="selectQuestionCountByTag" resultType="int">
+    <if test="qList == null">
+      select
+      count(1)
+      from questiontag qt
+      <if test="tagid != null">
+        where qt.tagid = #{tagid, jdbcType=INTEGER}
+      </if>
+    </if>
+    <if test="qList != null">
+      select count(1)
+      from (select q.*,u.username, sum(0
+      <foreach collection="qList" item="q" index="index" >
+        +(case when instr(title,#{q})>0 then 1 else 0 end)
+        +(case when instr(content, #{q})>0 then 1 else 0 end)
+      </foreach>
+      )
+      as cnt from question q, user u, questiontag qt where q.userid=u.id
+      <if test="tagid != null">
+        and qt.tagid = #{qt.tagid}
+      </if>
+      group by id) as temp
+      where cnt>0
+    </if>
+  </select>
+  <select id="selectDynamics"  resultMap="BaseResultMap">
+    select q.*, fu.username
+    from user u, user fu, question q
+    where u.id=#{id, jdbcType=VARCHAR} and fu.id=q.userid and (q.userid in (select f.followuserid from follow f where f.userid=u.id ) or q.userid = u.id)
+    order by date desc
+    limit #{startPos}, #{pageSize}
+  </select>
+  <select id="selectDynamicsCount" parameterType="java.lang.String" resultType="int">
+    select count(1)
+    from user u, user fu, question q
+    where u.id=#{id, jdbcType=VARCHAR} and fu.id=q.userid and (q.userid in (select f.followuserid from follow f where f.userid=u.id ) or q.userid = u.id)
+    order by date desc
+  </select>
+  <update id="overQuestion">
+    update question set isover = #{isover} where id=#{id}
+  </update>
+  <select id="selectViews" resultType="int">
+    select views from question where id = #{id}
+  </select>
+  <update id="updateViews">
+    update question set views = views+1 where id = #{id}
+  </update>
+  <select id="selectQuestions" resultMap="BaseResultMap">
+    select q.*, u.username, t.id tagid, t.name tagname
+	from question q, user u,questiontag qt, tag t
+    where q.userid = u.id and qt.tagid=t.id and qt.questionid=q.id
+  </select>
+</mapper>
